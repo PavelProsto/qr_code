@@ -6,7 +6,7 @@ import re
 import os.path
 
 
-prefixes_android = {'serial_add': 'cryptopro://csp/license/add/', 'serv_add': 'cryptopro://csp/profile/add/',
+PREFIXES = {'serial_add': 'cryptopro://csp/license/add/', 'serv_add': 'cryptopro://csp/profile/add/',
                      'root_add': 'cryptopro://csp/root/add/', 'ca_add': 'cryptopro://csp/intermediate/add/',
                      'crl_add': 'cryptopro://csp/crl/add/', 'pfx_add': 'cryptopro://csp/pfx/add/'} 
 len_max = 2500 #максимальная длинна на один qr код
@@ -48,13 +48,13 @@ def prfx_get():
         cert_type = input('Введите тип файла: Ca, Root, pfx, CRL: ')
         match cert_type:
             case 'CA' | 'ca' | 'Ca': 
-                prfx = prefixes_android['ca_add']
+                prfx = PREFIXES['ca_add']
             case 'root' | 'Root' | 'ROOT':
-                prfx = prefixes_android['root_add']
+                prfx = PREFIXES['root_add']
             case 'PFX' | 'Pfx' | 'pfx': 
-                prfx = prefixes_android['pfx_add']
+                prfx = PREFIXES['pfx_add']
             case 'CRL' | 'Crl' | 'crl': 
-                prfx = prefixes_android['crl_add'] 
+                prfx = PREFIXES['crl_add'] 
             case _:
                 print('Указан не корректный тип файла!')           
     return cert_type, prfx
@@ -77,7 +77,7 @@ def gen_qr(chunk,cert_type,part_number):
 
 
 def serial_gen(serial_nmbr):
-    fnl_string = prefixes_android['serial_add'] + serial_nmbr
+    fnl_string = PREFIXES['serial_add'] + serial_nmbr
     gen_qr(fnl_string,'serial', '1')
 
 
@@ -88,7 +88,7 @@ def cert_gen(filepath, code_type, cert_type, prfx):
         chunks = [cert_encoded[i:i+len_max] for i in range(0, len(cert_encoded), len_max)]
         #for n in range(1, parts_total + 1): #значение n определяет нумерацию сегментов, начнётся она с 1
         #    gen_qr(prfx + str(code_type) + '/' + str(parts_total) + '/' + str(n) + '/' + chunks[n-1], cert_type, n)
-        for n in range(parts_total): #значение n определяет нумерацию сегментов, или с 0
+        for n in range(parts_total): # или с 0
             gen_qr(prfx + str(code_type) + '/' + str(parts_total) + '/' + str(n) + '/' + chunks[n], cert_type, n)
     else:
         gen_qr(prfx + code_type + '/1/1/' + cert_encoded, cert_type, '1')
@@ -110,7 +110,7 @@ def start_menu():
             auth_type = input('Введите тип аутентификации 1 - сертификат, 2 - логин\пароль, 3 - смешанный: ')
             server_uri = input('Введите URI сервера: ')
             profile_name = input('Введите имя профиля: ')
-            gen_qr(prefixes_android['serv_add'] + profile_name + '/' + auth_type + '/' + server_uri + '/', 'uri', '1')
+            gen_qr(PREFIXES['serv_add'] + profile_name + '/' + auth_type + '/' + server_uri + '/', 'uri', '1')
         case '3':
             filepath = file_get()
             cert_type, prfx = prfx_get()
